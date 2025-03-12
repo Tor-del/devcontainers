@@ -5,6 +5,9 @@ on:
 
 jobs:
   trigger-other:
+    permissions:
+      packages: write
+      contents: read
     uses: "./.github/workflows/builder.yml"
     with:
       build_target: node
