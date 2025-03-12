@@ -1,0 +1,32 @@
+FROM mcr.microsoft.com/devcontainers/base:bookworm
+
+RUN set -x \
+    && export DEBIAN_FRONTEND=noninteractive \
+    && apt update \
+    && apt install -y --no-install-recommends --no-install-suggests \
+    git curl zsh exa unzip \
+    # Clean up
+    && apt clean autoclean \
+    && apt autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
+
+ARG USERNAME=vscode
+
+RUN chsh -s $(which zsh) ${USERNAME}
+
+USER ${USERNAME}
+
+ARG OHMYZSH_INSTALLER="https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"
+ARG POWERLEVEL10K_INSTALLER="https://github.com/romkatv/powerlevel10k.git"
+
+RUN set -x \
+    && rm -rf ~/.oh-my-zsh \
+    && curl -fsSL ${OHMYZSH_INSTALLER} | bash \
+    && git clone --depth=1 ${POWERLEVEL10K_INSTALLER} "/home/${USERNAME}/.oh-my-zsh/custom/themes/powerlevel10k" \
+    && echo "Oh My Zsh and Powerlevel10k installation complete."
+COPY --chown=${USERNAME} ./zsh/* /home/${USERNAME}/
+
+
+RUN set -x \
+    && curl -fsSL https://bun.sh/install | bash \
+    && echo "Bun installation complete."
